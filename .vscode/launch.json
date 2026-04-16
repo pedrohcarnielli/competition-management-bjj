@@ -1,0 +1,27 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch API with Environment Variables",
+            "program": "${workspaceFolder}/src/index.ts",
+            "runtimeExecutable": "ts-node-dev",
+            "runtimeArgs": [
+                "--respawn",
+                "--transpile-only"
+            ],
+            "env": {
+                "GOOGLE_CLOUD_PROJECT": "competition-management-bjj",
+                "PHOTO_BUCKET": "your-photo-bucket-name",
+                "API_KEY_BUCKET": "your-api-key-bucket-name",
+                "API_KEY_FILE": "api-key-secret.txt",
+                "GCP_TENANT_ID": "your-tenant-id",
+                "FIREBASE_WEB_API_KEY": "your-firebase-web-api-key",
+                "PORT": "3000"
+            },
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
+        }
+    ]
+}
