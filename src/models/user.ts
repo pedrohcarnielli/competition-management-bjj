@@ -11,14 +11,18 @@ export interface User {
   photo?: string;
   email: string;
   phone: string;
+  documentNumber?: string;
   roles: Role[];
   responsibleLegalEmail?: string;
   technicalResponsibleEmail?: string;
-  passwordHash?: string;
   firebaseUid?: string;
   deletedAt?: string | null;
   createdAt: string;
   updatedAt: string;
+  updatedBy?: {
+    uid: string;
+    email: string;
+  };
   history: UserHistoryEntry[];
 }
 
@@ -30,6 +34,7 @@ export interface UserPayload {
   photoBase64?: string;
   email?: string;
   phone?: string;
+  documentNumber?: string;
   roles?: Role[];
   responsibleLegalEmail?: string;
   technicalResponsibleEmail?: string;

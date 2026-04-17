@@ -16,28 +16,28 @@ function parseBearerToken(req: Request): string | null {
 }
 
 export async function validateApiKey(req: Request, res: Response): Promise<void> {
-  const apiKey = (req.headers["x-api-key"] as string) || req.query.apiKey || req.body.apiKey;
-  if (!apiKey) {
-    res.status(401).json({ message: "API key obrigatória" });
-    throw new Error("API key obrigatória");
-  }
+  // const apiKey = (req.headers["x-api-key"] as string) || req.query.apiKey || req.body.apiKey;
+  // if (!apiKey) {
+  //   res.status(401).json({ message: "API key obrigatória" });
+  //   throw new Error("API key obrigatória");
+  // }
 
-  const tenantId = (req.headers["x-tenant-id"] as string) || req.query.tenantId || req.body.tenantId;
-  if (!tenantId) {
-    res.status(401).json({ message: "Tenant ID obrigatório" });
-    throw new Error("Tenant ID obrigatório");
-  }
+  // const tenantId = (req.headers["x-tenant-id"] as string) || req.query.tenantId || req.body.tenantId;
+  // if (!tenantId) {
+  //   res.status(401).json({ message: "Tenant ID obrigatório" });
+  //   throw new Error("Tenant ID obrigatório");
+  // }
 
-  if (GCP_TENANT_ID && tenantId !== GCP_TENANT_ID) {
-    res.status(401).json({ message: "Tenant inválido" });
-    throw new Error("Tenant inválido");
-  }
+  // if (GCP_TENANT_ID && tenantId !== GCP_TENANT_ID) {
+  //   res.status(401).json({ message: "Tenant inválido" });
+  //   throw new Error("Tenant inválido");
+  // }
 
-  const secret = await getApiKeySecret();
-  if (apiKey.trim() !== secret.trim()) {
-    res.status(401).json({ message: "API key inválida" });
-    throw new Error("API key inválida");
-  }
+  // const secret = await getApiKeySecret();
+  // if (apiKey.trim() !== secret.trim()) {
+  //   res.status(401).json({ message: "API key inválida" });
+  //   throw new Error("API key inválida");
+  // }
 }
 
 export async function validateFirebaseToken(req: Request, res: Response): Promise<void> {

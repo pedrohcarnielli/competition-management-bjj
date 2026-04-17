@@ -4,24 +4,49 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch API with Environment Variables",
-            "program": "${workspaceFolder}/src/index.ts",
-            "runtimeExecutable": "ts-node-dev",
-            "runtimeArgs": [
-                "--respawn",
-                "--transpile-only"
+            "name": "Run Local API (Production)",
+            "runtimeExecutable": "node",
+            "program": "${workspaceFolder}/node_modules/ts-node/dist/bin.js",
+            "args": [
+                "src/index.ts"
             ],
             "env": {
-                "GOOGLE_CLOUD_PROJECT": "competition-management-bjj",
-                "PHOTO_BUCKET": "your-photo-bucket-name",
-                "API_KEY_BUCKET": "your-api-key-bucket-name",
                 "API_KEY_FILE": "api-key-secret.txt",
                 "GCP_TENANT_ID": "your-tenant-id",
                 "FIREBASE_WEB_API_KEY": "your-firebase-web-api-key",
                 "PORT": "3000"
             },
             "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen"
+            "internalConsoleOptions": "neverOpen",
+            "skipFiles": [
+                "<node_internals>/**",
+                "node_modules/**"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug Local API",
+            "runtimeExecutable": "node",
+            "program": "${workspaceFolder}/node_modules/ts-node/dist/bin.js",
+            "args": [
+                "--transpile-only",
+                "src/index.ts"
+            ],
+            "env": {
+                "API_KEY_FILE": "api-key-secret.txt",
+                "GCP_TENANT_ID": "your-tenant-id",
+                "FIREBASE_WEB_API_KEY": "AIzaSyCzR1BNHDehLBZNy13OXLi8rg4LDRryORs",
+                "PORT": "3000",
+                "GOOGLE_APPLICATION_CREDENTIALS": "firebase-config/competition-management-bjj-firebase.json",
+                "FIREBASE_STORAGE_BUCKET": "gs://competition-management-bjj.firebasestorage.app"
+            },
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "skipFiles": [
+                "<node_internals>/**",
+                "node_modules/**"
+            ]
         }
     ]
 }

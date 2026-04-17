@@ -7,7 +7,8 @@ export function validateUserPayload(
     payload: UserPayload,
     existingUsers: User[],
     currentUserId?: string,
-    requirePassword = false
+    requirePassword = false,
+    partial = false
 ): string[] {
     const errors: string[] = [];
     const requiredFields = ["fullName", "birthDate", "weight", "graduation", "email", "phone", "roles"];
@@ -15,9 +16,20 @@ export function validateUserPayload(
         requiredFields.push("password");
     }
 
-    for (const field of requiredFields) {
-        if (payload[field as keyof UserPayload] === undefined || payload[field as keyof UserPayload] === null) {
-            errors.push(`Campo obrigatório ausente: ${field}`);
+    if (!partial) {
+        for (const field of requiredFields) {
+            if (payload[field as keyof UserPayload] === undefined || payload[field as keyof UserPayload] === null) {
+                errors.push(`Campo obrigatório ausente: ${field}`);
+            }
+        }
+    }
+
+    if (partial) {
+        if (payload.email !== undefined) {
+            errors.push("email não pode ser alterado no update");
+        }
+        if (payload.password !== undefined) {
+            errors.push("password não pode ser alterado no update");
         }
     }
 
@@ -103,6 +115,18 @@ export function validateUserPayload(
             errors.push("technicalResponsibleEmail deve ser um email de usuário existente com role responsável técnico");
         } else if (!responsible.roles.includes("responsável técnico")) {
             errors.push("technicalResponsibleEmail deve apontar para um usuário com role responsável técnico");
+        }
+    }
+
+    if (payload.documentNumber !== undefined) {
+        if (typeof payload.documentNumber !== "string" || payload.documentNumber.trim().length === 0) {
+            errors.push("documentNumber deve ser uma string não vazia");
+        } else {
+            // Validação básica de formato de documento (apenas números, pontos, traços)
+            const documentRegex = /^[0-9.\-]+$/;
+            if (!documentRegex.test(payload.documentNumber.trim())) {
+                errors.push("documentNumber deve conter apenas números, pontos e traços");
+            }
         }
     }
 

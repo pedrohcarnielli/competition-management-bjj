@@ -30,6 +30,40 @@ npm install
 npm run serve
 ```
 
+## Execução Local usando Firebase Remoto
+
+Este projeto pode rodar localmente usando `src/index.ts` como servidor Express, apontando para os serviços Firebase remotos.
+
+### Comando para rodar localmente
+
+```bash
+npm run serve
+```
+
+### Comando para debug local
+
+```bash
+npm run serve:debug
+```
+
+### Observações
+
+- Todas as requisições feitas localmente serão servidas em `http://localhost:3000`.
+- A lógica de API roda localmente, mas Firestore/Auth/Storage são acessados no Firebase remoto.
+- Não é necessário usar emulador para essa execução local.
+- Você precisa ter credenciais Firebase configuradas no ambiente, por exemplo:
+  - `GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json`
+  - ou `gcloud auth application-default login`
+- As variáveis de ambiente necessárias ainda são:
+  - `API_KEY_FILE`
+  - `GCP_TENANT_ID`
+  - `FIREBASE_WEB_API_KEY`
+
+### Endpoints de documentação
+
+- Swagger UI: `GET http://localhost:3000/docs`
+- OpenAPI JSON: `GET http://localhost:3000/swagger.json`
+
 ## Build
 
 ```bash
@@ -41,6 +75,28 @@ npm run build
 ```bash
 npm run deploy
 ```
+
+## Testes com Postman
+
+Para testar a API localmente, importe os arquivos do Postman:
+
+1. **Environment**: `Competition-Management-BJJ.postman_environment.json`
+2. **Collection**: `Competition-Management-BJJ.postman_collection.json`
+
+### Configuração do Environment
+
+Antes de testar, configure as variáveis no environment:
+
+- `api_key`: Defina com o conteúdo do seu arquivo de chave API
+- `tenant_id`: Defina com seu tenant ID
+- `firebase_token`: Obtenha fazendo login via a request "Login" e copie o token
+
+### Ordem de Testes
+
+1. **Login**: Faça login para obter o token Firebase
+2. **Get Users**: Teste a listagem de usuários
+3. **Create User**: Crie um novo usuário
+4. **Update/Delete**: Teste atualização e deleção usando o ID do usuário criado
 
 ## Funções disponíveis
 
