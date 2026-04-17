@@ -1,3 +1,4 @@
+import "./env";
 import * as functions from "firebase-functions";
 import swaggerUi from "swagger-ui-express";
 import { swaggerDocument } from "./swagger";

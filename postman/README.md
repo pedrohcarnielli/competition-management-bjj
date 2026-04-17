@@ -4,8 +4,8 @@ Este documento explica como configurar e usar o Postman para testar a API Fireba
 
 ## Arquivos Necessários
 
-- `Competition-Management-BJJ.postman_environment.json` - Environment com variáveis
-- `Competition-Management-BJJ.postman_collection.json` - Collection com todas as requests
+- `environments/Competition-Management-BJJ.postman_environment.json` - Environment com variáveis
+- `collections/Competition-Management-BJJ.postman_collection.json` - Collection com todas as requests
 
 ## Configuração Inicial
 
@@ -14,8 +14,8 @@ Este documento explica como configurar e usar o Postman para testar a API Fireba
 1. Abra o Postman
 2. Clique em "Import" (botão no topo esquerdo)
 3. Selecione "File"
-4. Importe primeiro o environment: `Competition-Management-BJJ.postman_environment.json`
-5. Depois importe a collection: `Competition-Management-BJJ.postman_collection.json`
+4. Importe primeiro o environment: `postman/environments/Competition-Management-BJJ.postman_environment.json`
+5. Depois importe a collection: `postman/collections/Competition-Management-BJJ.postman_collection.json`
 
 ### 2. Configurar Environment
 

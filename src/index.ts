@@ -1,3 +1,4 @@
+import "./env";
 import { startLocalApp } from "./routes";
 export * from "./functions";
 

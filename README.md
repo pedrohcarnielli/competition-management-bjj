@@ -19,6 +19,12 @@ npm install
 
 ## Variáveis de ambiente
 
+Crie um arquivo local com as variáveis a partir do exemplo:
+
+```bash
+cp .env.example .env
+```
+
 - `API_KEY_BUCKET` - nome do bucket do Cloud Storage para a chave API
 - `API_KEY_FILE` - nome do arquivo da chave API no bucket
 - `GCP_TENANT_ID` - ID do tenant GCP para validação
@@ -80,8 +86,8 @@ npm run deploy
 
 Para testar a API localmente, importe os arquivos do Postman:
 
-1. **Environment**: `Competition-Management-BJJ.postman_environment.json`
-2. **Collection**: `Competition-Management-BJJ.postman_collection.json`
+1. **Environment**: `postman/environments/Competition-Management-BJJ.postman_environment.json`
+2. **Collection**: `postman/collections/Competition-Management-BJJ.postman_collection.json`
 
 ### Configuração do Environment
 

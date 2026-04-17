@@ -10,12 +10,7 @@
             "args": [
                 "src/index.ts"
             ],
-            "env": {
-                "API_KEY_FILE": "api-key-secret.txt",
-                "GCP_TENANT_ID": "your-tenant-id",
-                "FIREBASE_WEB_API_KEY": "your-firebase-web-api-key",
-                "PORT": "3000"
-            },
+            "envFile": "${workspaceFolder}/.env",
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",
             "skipFiles": [
@@ -33,14 +28,7 @@
                 "--transpile-only",
                 "src/index.ts"
             ],
-            "env": {
-                "API_KEY_FILE": "api-key-secret.txt",
-                "GCP_TENANT_ID": "your-tenant-id",
-                "FIREBASE_WEB_API_KEY": "AIzaSyCzR1BNHDehLBZNy13OXLi8rg4LDRryORs",
-                "PORT": "3000",
-                "GOOGLE_APPLICATION_CREDENTIALS": "firebase-config/competition-management-bjj-firebase.json",
-                "FIREBASE_STORAGE_BUCKET": "gs://competition-management-bjj.firebasestorage.app"
-            },
+            "envFile": "${workspaceFolder}/.env",
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",
             "skipFiles": [
