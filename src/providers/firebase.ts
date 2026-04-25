@@ -4,7 +4,7 @@ import { getAuth, Auth } from "firebase/auth";
 
 const adminConfig = {
   credential: admin.credential.applicationDefault(),
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+  storageBucket: process.env.FB_STORAGE_BUCKET,
 };
 
 if (!admin.apps.length) {
@@ -13,9 +13,9 @@ if (!admin.apps.length) {
 
 // Initialize Firebase Web SDK for authentication (email/password login)
 const webConfig = {
-  apiKey: process.env.FIREBASE_WEB_API_KEY,
-  projectId: process.env.FIREBASE_PROJECT_ID || "competition-management-bjj",
-  authDomain: process.env.FIREBASE_AUTH_DOMAIN || "competition-management-bjj.firebaseapp.com",
+  apiKey: process.env.FB_WEB_API_KEY,
+  projectId: process.env.FB_PROJECT_ID || "competition-management-bjj",
+  authDomain: process.env.FB_AUTH_DOMAIN || "competition-management-bjj.firebaseapp.com",
 };
 
 let authInstance: Auth | null = null;

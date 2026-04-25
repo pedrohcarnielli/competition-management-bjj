@@ -2,7 +2,7 @@ import * as functions from "firebase-functions";
 import { firestore } from "../providers/firebase";
 import { sendJson } from "./common";
 
-const MAIL_COLLECTION = process.env.FIREBASE_MAIL_COLLECTION || "mail";
+const MAIL_COLLECTION = process.env.MAIL_COLLECTION || "mail";
 
 export async function getEmailHealthHandler(req: functions.Request, res: functions.Response) {
     if (req.method !== "GET") {

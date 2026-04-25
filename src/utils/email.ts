@@ -1,7 +1,7 @@
 import { User } from "../models";
 import { firestore } from "../providers/firebase";
 
-const MAIL_COLLECTION = process.env.FIREBASE_MAIL_COLLECTION || "mail";
+const MAIL_COLLECTION = process.env.MAIL_COLLECTION || "mail";
 
 async function enqueueEmail(to: string, subject: string, text: string) {
   const now = new Date().toISOString();
