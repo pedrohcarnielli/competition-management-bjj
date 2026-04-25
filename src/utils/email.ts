@@ -1,6 +1,24 @@
 import { User } from "../models";
+import { firestore } from "../providers/firebase";
 
-export function sendApprovalRequestEmail(type: "legal" | "technical", responsibleEmail: string, requester: User) {
+const MAIL_COLLECTION = process.env.FIREBASE_MAIL_COLLECTION || "mail";
+
+async function enqueueEmail(to: string, subject: string, text: string) {
+  const now = new Date().toISOString();
+  await firestore.collection(MAIL_COLLECTION).add({
+    to: [to],
+    message: {
+      subject,
+      text,
+    },
+    status: "PENDING",
+    createdAt: now,
+    updatedAt: now,
+    attempts: 0,
+  });
+}
+
+export async function sendApprovalRequestEmail(type: "legal" | "technical", responsibleEmail: string, requester: User) {
   const subject = type === "legal"
     ? "Aprovação de dependente legal"
     : "Aprovação de responsável técnico";
@@ -9,12 +27,10 @@ export function sendApprovalRequestEmail(type: "legal" | "technical", responsibl
     ? `O usuário ${requester.fullName} (${requester.email}) solicitou ser seu dependente legal.`
     : `O usuário ${requester.fullName} (${requester.email}) solicitou que você seja seu responsável técnico.`;
 
-  console.info("[EMAIL SIMULADO] Para:", responsibleEmail);
-  console.info("[EMAIL SIMULADO] Assunto:", subject);
-  console.info("[EMAIL SIMULADO] Mensagem:", body);
+  await enqueueEmail(responsibleEmail, subject, body);
 }
 
-export function sendApprovalResponseEmail(type: "legal" | "technical", requesterEmail: string, approved: boolean) {
+export async function sendApprovalResponseEmail(type: "legal" | "technical", requesterEmail: string, approved: boolean) {
   const subject = approved
     ? "Solicitação aprovada"
     : "Solicitação rejeitada";
@@ -23,7 +39,5 @@ export function sendApprovalResponseEmail(type: "legal" | "technical", requester
     ? `Seu pedido foi aprovado pelo responsável.`
     : `Seu pedido foi rejeitado pelo responsável.`;
 
-  console.info("[EMAIL SIMULADO] Para:", requesterEmail);
-  console.info("[EMAIL SIMULADO] Assunto:", subject);
-  console.info("[EMAIL SIMULADO] Mensagem:", body);
+  await enqueueEmail(requesterEmail, subject, body);
 }

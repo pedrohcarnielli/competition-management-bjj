@@ -12,7 +12,11 @@ export async function getUsersHandler(req: functions.Request, res: functions.Res
     await validateApiKey(req, res);
     await validateFirebaseToken(req, res);
     const users = await getActiveUsers();
-    sendJson(res, users.map(sanitizeUser));
+    const usersWithoutHistory = users.map((user) => {
+        const { history, ...publicUser } = sanitizeUser(user);
+        return publicUser;
+    });
+    sendJson(res, usersWithoutHistory);
 }
 
 export async function getUserByIdHandler(req: functions.Request, res: functions.Response) {
@@ -31,7 +35,8 @@ export async function getUserByIdHandler(req: functions.Request, res: functions.
     if (!user || user.deletedAt) {
         return sendJson(res, { message: "Usuário não encontrado" }, 404);
     }
-    sendJson(res, sanitizeUser(user));
+    const { history, ...publicUser } = sanitizeUser(user);
+    sendJson(res, publicUser);
 }
 
 export async function getUserHistoryHandler(req: functions.Request, res: functions.Response) {

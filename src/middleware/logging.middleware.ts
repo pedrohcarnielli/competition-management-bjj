@@ -83,6 +83,8 @@ export function errorLoggingMiddleware(err: any, req: Request, res: Response, ne
     console.error(`[${timestamp}] ERROR [${requestId}] Stack:`, err.stack);
 
     if (!res.headersSent) {
-        res.status(500).json({ error: "Internal server error", requestId });
+        const status = typeof err?.status === "number" ? err.status : 500;
+        const errorPayload = err?.errors ?? err?.message ?? "Internal server error";
+        res.status(status).json({ error: errorPayload, requestId });
     }
 }

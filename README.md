@@ -29,6 +29,17 @@ cp .env.example .env
 - `API_KEY_FILE` - nome do arquivo da chave API no bucket
 - `GCP_TENANT_ID` - ID do tenant GCP para validação
 - `FIREBASE_WEB_API_KEY` - chave da API web do Firebase para autenticação
+- `FIREBASE_MAIL_COLLECTION` - coleção Firestore monitorada para envio real de e-mails (padrão: `mail`)
+
+## Envio real de e-mails via Firebase
+
+O projeto envia e-mails enfileirando documentos na coleção Firestore definida em `FIREBASE_MAIL_COLLECTION`.
+Para o envio efetivo, instale e configure a extensão oficial **Trigger Email** do Firebase:
+
+- Extensão: `firebase/firestore-send-email`
+- Coleção padrão monitorada: `mail`
+
+Sem a extensão instalada/configurada, os documentos serão criados no Firestore, mas os e-mails não serão disparados.
 
 ## Desenvolvimento
 
@@ -69,6 +80,7 @@ npm run serve:debug
 
 - Swagger UI: `GET http://localhost:3000/docs`
 - OpenAPI JSON: `GET http://localhost:3000/swagger.json`
+- Health do e-mail: `GET http://localhost:3000/health/email`
 
 ## Build
 
@@ -78,9 +90,74 @@ npm run build
 
 ## Deploy
 
+### Via npm scripts
+
 ```bash
 npm run deploy
 ```
+
+### Via Scripts Shell
+
+Este projeto inclui scripts shell para facilitar o deployment:
+
+#### 1. Deploy Firebase Functions e Firestore
+
+Faz deploy de Cloud Functions, regras e indexes do Firestore:
+
+```bash
+# Deploy apenas das functions (padrão)
+./scripts/deploy-functions.sh
+
+# Deploy apenas das functions (explícito)
+./scripts/deploy-functions.sh functions
+
+# Deploy completo: functions + firestore rules + indexes
+./scripts/deploy-functions.sh all
+```
+
+**Opções disponíveis:**
+- sem parâmetro ou `functions` - Deploy apenas das Cloud Functions
+- `all` - Deploy completo (functions, Firestore rules e indexes)
+
+**O que faz:**
+- Valida instalação do Firebase CLI
+- Verifica autenticação Firebase
+- Instala dependências (`npm install`)
+- Compila TypeScript (`npm run build`)
+- Deploy conforme opção selecionada:
+  - `functions`: executa `firebase deploy --only functions`
+  - `all`: executa `firebase deploy` (tudo)
+
+**Pré-requisitos:**
+- Firebase CLI instalado: `npm install -g firebase-tools`
+- Autenticado no Firebase: `firebase login`
+- Projeto Firebase configurado em `firebase.json`
+
+#### 2. Deploy/Serve da API
+
+Inicia ou faz deploy da API em diferentes ambientes:
+
+```bash
+# Ambiente local (padrão)
+./scripts/deploy-api.sh local
+
+# Com debug
+./scripts/deploy-api.sh serve:debug
+
+# Info de produção
+./scripts/deploy-api.sh production
+```
+
+**Opções disponíveis:**
+- `local` - Inicia servidor local na porta 3000 (Express)
+- `serve:debug` - Inicia servidor com inspetor node habilitado para debug
+- `production` - Mostra instruções de deploy em produção
+
+**O que faz:**
+- Valida se está na raiz do projeto
+- Instala dependências (`npm install`)
+- Compila TypeScript (`npm run build`)
+- Inicia servidor conforme ambiente selecionado
 
 ## Testes com Postman
 
@@ -137,6 +214,7 @@ Antes de testar, configure as variáveis no environment:
 ## Regras implementadas
 
 - validação de graduação por idade
+  - regra: considera apenas o ano de nascimento (mês e dia são desconsiderados)
 - roles: `Aluno`, `responsável legal`, `responsável técnico`, `adm`
 - aluno menor de 18 deve ter `responsibleLegalEmail`
 - aluno deve ter `technicalResponsibleEmail`

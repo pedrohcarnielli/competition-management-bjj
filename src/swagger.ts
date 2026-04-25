@@ -26,6 +26,37 @@ export const swaggerDocument = {
                 }
             }
         },
+        "/health/email": {
+            get: {
+                summary: "Verificar saúde do envio de e-mails",
+                responses: {
+                    "200": {
+                        description: "Fila de e-mails acessível",
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    type: "object",
+                                    properties: {
+                                        status: { type: "string" },
+                                        email: {
+                                            type: "object",
+                                            properties: {
+                                                healthy: { type: "boolean" },
+                                                provider: { type: "string" },
+                                                collection: { type: "string" }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        description: "Falha na verificação da fila de e-mails"
+                    }
+                }
+            }
+        },
         "/getUsers": {
             get: {
                 summary: "Listar usuários ativos",

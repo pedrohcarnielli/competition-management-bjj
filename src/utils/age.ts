@@ -1,13 +1,7 @@
 export function calculateAge(birthDate: string): number {
   const today = new Date();
-  const birth = new Date(birthDate);
-  let age = today.getFullYear() - birth.getFullYear();
-  const monthDiff = today.getMonth() - birth.getMonth();
-  const dayDiff = today.getDate() - birth.getDate();
+  const birthYear = Number.parseInt(birthDate.slice(0, 4), 10);
 
-  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-    age -= 1;
-  }
-
-  return age;
+  // Regra de negocio: idade considera apenas ano de nascimento.
+  return today.getFullYear() - birthYear;
 }

@@ -173,7 +173,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fullName\": \"João Silva\",\n  \"birthDate\": \"1990-01-01\",\n  \"weight\": 75.5,\n  \"graduation\": \"branca\",\n  \"email\": \"joao.silva@example.com\",\n  \"phone\": \"+5511999999999\",\n  \"documentNumber\": \"123.456.789-00\",\n  \"roles\": [\"atleta\"],\n  \"responsibleLegalEmail\": \"legal@example.com\",\n  \"technicalResponsibleEmail\": \"technical@example.com\",\n  \"password\": \"password123\",\n  \"photoBase64\": \"base64-encoded-image-here\"\n}"
+              "raw": "{\n  \"fullName\": \"João Silva\",\n  \"birthDate\": \"1990-01-01\",\n  \"weight\": 75.5,\n  \"graduation\": \"Branca\",\n  \"email\": \"joao.silva@example.com\",\n  \"phone\": \"+5511999999999\",\n  \"documentNumber\": \"123.456.789-00\",\n  \"roles\": [\"Aluno\"],\n  \"responsibleLegalEmail\": \"legal@example.com\",\n  \"technicalResponsibleEmail\": \"technical@example.com\",\n  \"password\": \"password123\",\n  \"photoBase64\": \"base64-encoded-image-here\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/createUserFunction",
@@ -211,7 +211,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fullName\": \"João Silva Atualizado\",\n  \"birthDate\": \"1990-01-01\",\n  \"weight\": 76.0,\n  \"graduation\": \"azul\",\n  \"email\": \"joao.silva@example.com\",\n  \"phone\": \"+5511999999999\",\n  \"documentNumber\": \"123.456.789-00\",\n  \"roles\": [\"atleta\"],\n  \"responsibleLegalEmail\": \"legal@example.com\",\n  \"technicalResponsibleEmail\": \"technical@example.com\",\n  \"photoBase64\": \"base64-encoded-image-here\"\n}"
+              "raw": "{\n  \"fullName\": \"João Silva Atualizado\",\n  \"weight\": 76.0,\n  \"graduation\": \"Azul\",\n  \"phone\": \"+5511999999999\",\n  \"roles\": [\"Aluno\"]\n}"
             },
             "url": {
               "raw": "{{base_url}}/updateUserFunction?id={{user_id}}",
@@ -228,7 +228,7 @@
                 }
               ]
             },
-            "description": "Update an existing user. Set user_id in environment variables."
+            "description": "Update an existing user with partial payload. Campos email e password não são permitidos no update."
           }
         },
         {
@@ -502,6 +502,24 @@
             },
             "description": "OpenAPI 3.0 specification in JSON format"
           }
+        },
+        {
+          "name": "Email Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health/email",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "health",
+                "email"
+              ]
+            },
+            "description": "Verifica conectividade da fila de e-mails no Firestore."
+          }
         }
       ]
     }
@@ -509,7 +527,7 @@
   "variable": [
     {
       "key": "base_url",
-      "value": "http://127.0.0.1:5001/competition-management-bjj/us-central1"
+      "value": "http://127.0.0.1:3000"
     }
   ]
 }

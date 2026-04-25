@@ -1,5 +1,6 @@
 import { v4 as uuid } from "uuid";
 import { ApprovalRequest, User, UserPayload } from "../models";
+import { Graduation } from "../models/graduation";
 import { findUserByEmailExcludingId, findUserByEmail, getUserById, listUsers, saveUser } from "../repositories/user.repository";
 import { saveApproval } from "../repositories/approval.repository";
 import { sendApprovalRequestEmail } from "../utils/email";
@@ -11,6 +12,10 @@ function now(): string {
     return new Date().toISOString();
 }
 
+function normalizeGraduation(value: string): Graduation {
+    return value.trim().toLowerCase() as Graduation;
+}
+
 function buildHistoryEntry(user: User) {
     const { history, firebaseUid, ...snapshot } = user;
     return {
@@ -19,7 +24,7 @@ function buildHistoryEntry(user: User) {
     };
 }
 
-function createApprovalRequest(type: "legal" | "technical", requester: User, responsibleEmail: string): ApprovalRequest {
+async function createApprovalRequest(type: "legal" | "technical", requester: User, responsibleEmail: string): Promise<ApprovalRequest> {
     const approval: ApprovalRequest = {
         id: uuid(),
         type,
@@ -31,7 +36,7 @@ function createApprovalRequest(type: "legal" | "technical", requester: User, res
         updatedAt: now(),
     };
 
-    sendApprovalRequestEmail(type, responsibleEmail, requester);
+    await sendApprovalRequestEmail(type, responsibleEmail, requester);
     return approval;
 }
 
@@ -70,7 +75,7 @@ export async function createUser(payload: UserPayload): Promise<{ user: User; ap
         fullName: payload.fullName!.trim(),
         birthDate: payload.birthDate!,
         weight: payload.weight!,
-        graduation: payload.graduation!,
+        graduation: normalizeGraduation(payload.graduation!),
         photo: undefined,
         email,
         phone: payload.phone!.trim(),
@@ -103,11 +108,11 @@ export async function createUser(payload: UserPayload): Promise<{ user: User; ap
     const approvals: ApprovalRequest[] = [];
 
     if (savedUser.responsibleLegalEmail) {
-        const approval = createApprovalRequest("legal", savedUser, savedUser.responsibleLegalEmail);
+        const approval = await createApprovalRequest("legal", savedUser, savedUser.responsibleLegalEmail);
         approvals.push(await saveApproval(approval));
     }
     if (savedUser.technicalResponsibleEmail) {
-        const approval = createApprovalRequest("technical", savedUser, savedUser.technicalResponsibleEmail);
+        const approval = await createApprovalRequest("technical", savedUser, savedUser.technicalResponsibleEmail);
         approvals.push(await saveApproval(approval));
     }
 
@@ -145,7 +150,7 @@ export async function updateUser(
         existing.weight = payload.weight;
     }
     if (payload.graduation !== undefined) {
-        existing.graduation = payload.graduation;
+        existing.graduation = normalizeGraduation(payload.graduation);
     }
     if (payload.phone !== undefined) {
         existing.phone = payload.phone.trim();
@@ -185,11 +190,11 @@ export async function updateUser(
     const approvals: ApprovalRequest[] = [];
 
     if (savedUser.responsibleLegalEmail && savedUser.responsibleLegalEmail !== oldLegal) {
-        const approval = createApprovalRequest("legal", savedUser, savedUser.responsibleLegalEmail);
+        const approval = await createApprovalRequest("legal", savedUser, savedUser.responsibleLegalEmail);
         approvals.push(await saveApproval(approval));
     }
     if (savedUser.technicalResponsibleEmail && savedUser.technicalResponsibleEmail !== oldTechnical) {
-        const approval = createApprovalRequest("technical", savedUser, savedUser.technicalResponsibleEmail);
+        const approval = await createApprovalRequest("technical", savedUser, savedUser.technicalResponsibleEmail);
         approvals.push(await saveApproval(approval));
     }
 

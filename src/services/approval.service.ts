@@ -33,7 +33,7 @@ export async function respondApproval(id: string, approverEmail: string, approve
       requester.updatedAt = new Date().toISOString();
       await saveUser(requester);
     }
-    sendApprovalResponseEmail(approval.type, requester.email, approve);
+    await sendApprovalResponseEmail(approval.type, requester.email, approve);
   }
 
   return approval;

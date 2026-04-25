@@ -14,7 +14,10 @@ import {
 import { getApprovalsHandler, respondApprovalHandler } from "./handlers/approval.handlers";
 import { loginHandler } from "./handlers/auth.handlers";
 import { getGraduationsHandler } from "./handlers/graduation.handlers";
+import { getEmailHealthHandler } from "./handlers/health.handlers";
 import { getRolesHandler, getUsersByRoleHandler } from "./handlers/role.handlers";
+import { sendEmailMessage } from "./services/email-sender.service";
+import { firestore } from "./providers/firebase";
 
 const makeFirebaseFunction = (
     handler: (req: functions.Request, res: functions.Response) => Promise<void>
@@ -39,6 +42,7 @@ export const respondApprovalFunction = makeFirebaseFunction(respondApprovalHandl
 export const getGraduations = makeFirebaseFunction(getGraduationsHandler);
 export const getRoles = makeFirebaseFunction(getRolesHandler);
 export const getUsersByRole = makeFirebaseFunction(getUsersByRoleHandler);
+export const healthEmail = makeFirebaseFunction(getEmailHealthHandler);
 
 export const docs = functions.https.onRequest(async (req, res) => {
     try {
@@ -57,3 +61,50 @@ export const swaggerJson = functions.https.onRequest(async (req, res) => {
         handleError(res, error);
     }
 });
+
+// Função que monitora a coleção 'mail' e dispara os emails
+export const dispatchEmail = functions.firestore
+    .document("mail/{docId}")
+    .onCreate(async (snap, context) => {
+        const emailData = snap.data();
+        const docId = context.params.docId;
+        const now = new Date().toISOString();
+
+        try {
+            // Incrementa tentativas e marca como sendo processado
+            await snap.ref.update({
+                status: "PROCESSING",
+                attempts: (emailData.attempts || 0) + 1,
+                updatedAt: now,
+            });
+
+            // Envia o email
+            await sendEmailMessage({
+                to: emailData.to || [],
+                message: emailData.message || {},
+                createdAt: emailData.createdAt || now,
+            });
+
+            // Marca como enviado com sucesso
+            await snap.ref.update({
+                status: "SENT",
+                sentAt: now,
+                updatedAt: now,
+            });
+
+            console.log(`[FIRESTORE TRIGGER] Email enviado com sucesso. Doc ID: ${docId}`);
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
+            console.error(`[FIRESTORE TRIGGER] Erro ao enviar email. Doc ID: ${docId}`, error);
+
+            // Marca como erro
+            await snap.ref.update({
+                status: "ERROR",
+                errorMessage,
+                errorAt: now,
+                updatedAt: now,
+            });
+
+            throw error;
+        }
+    });

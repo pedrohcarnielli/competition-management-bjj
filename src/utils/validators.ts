@@ -3,6 +3,10 @@ import { getAllowedGraduations } from "../models/graduation";
 import { roles } from "../models/role";
 import { calculateAge } from "./age";
 
+function normalizeGraduation(value: string): string {
+    return value.trim().toLowerCase();
+}
+
 export function validateUserPayload(
     payload: UserPayload,
     existingUsers: User[],
@@ -72,7 +76,8 @@ export function validateUserPayload(
     if (payload.birthDate && payload.graduation) {
         const age = calculateAge(payload.birthDate);
         const allowed = getAllowedGraduations(age);
-        if (!allowed.includes(payload.graduation)) {
+        const normalizedGraduation = normalizeGraduation(payload.graduation);
+        if (!allowed.includes(normalizedGraduation as any)) {
             errors.push(`Graduação inválida para idade ${age}: ${payload.graduation}. Opções válidas: ${allowed.join(", ")}`);
         }
     }
