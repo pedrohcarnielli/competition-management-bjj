@@ -1,5 +1,4 @@
-import { Storage } from "@google-cloud/storage";
-import { PHOTO_BUCKET } from "../config";
+import { getStorage } from "firebase-admin/storage";
 
-export const storage = new Storage();
-export const photoBucketName = PHOTO_BUCKET;
+export const storage = getStorage();
+

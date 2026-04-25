@@ -1,34 +1,20 @@
-import { FIREBASE_WEB_API_KEY } from "../config";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { webAuth } from "../providers/firebase";
 
 export async function loginUser(email: string, password: string) {
-    if (!FIREBASE_WEB_API_KEY) {
-        throw { status: 500, message: "Firebase API key não configurada" };
+    try {
+        const userCredential = await signInWithEmailAndPassword(webAuth, email, password);
+        const idToken = await userCredential.user.getIdToken();
+
+        return {
+            idToken,
+            refreshToken: userCredential.user.refreshToken,
+            expiresIn: 3600,
+            localId: userCredential.user.uid,
+            email: userCredential.user.email,
+        };
+    } catch (error: any) {
+        const errorMessage = error?.message || "Credenciais inválidas";
+        throw { status: 401, message: errorMessage };
     }
-
-    const response = await fetch(
-        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${FIREBASE_WEB_API_KEY}`,
-        {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                email,
-                password,
-                returnSecureToken: true,
-            }),
-        }
-    );
-
-    const data = await response.json();
-    if (!response.ok) {
-        const message = data?.error?.message || "Credenciais inválidas";
-        throw { status: 401, message };
-    }
-
-    return {
-        idToken: data.idToken,
-        refreshToken: data.refreshToken,
-        expiresIn: data.expiresIn,
-        localId: data.localId,
-        email: data.email,
-    };
 }

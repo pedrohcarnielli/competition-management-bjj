@@ -1,6 +1,6 @@
 export const API_KEY_FILE = process.env.API_KEY_FILE || "";
 export const GCP_TENANT_ID = process.env.GCP_TENANT_ID || "";
-export const FIREBASE_WEB_API_KEY = process.env.FIREBASE_WEB_API_KEY || "";
+export const FIREBASE_WEB_API_KEY = process.env.FB_WEB_API_KEY || "";
 
 if (!API_KEY_FILE) {
     console.warn("Aviso: API_KEY_FILE não está definido. A validação da API key não funcionará.");
