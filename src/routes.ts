@@ -13,6 +13,7 @@ import { getApprovalsHandler, respondApprovalHandler } from "./handlers/approval
 import { loginHandler } from "./handlers/auth.handlers";
 import { getGraduationsHandler } from "./handlers/graduation.handlers";
 import { getEmailHealthHandler } from "./handlers/health.handlers";
+import { testEmailHandler } from "./handlers/email.handlers";
 import { getRolesHandler, getUsersByRoleHandler } from "./handlers/role.handlers";
 import { requestLoggingMiddleware, responseLoggingMiddleware, errorLoggingMiddleware } from "./middleware/logging.middleware";
 
@@ -53,6 +54,7 @@ export function buildLocalApp() {
         res.json({ status: "OK", message: "Local API server running" });
     });
     app.get("/health/email", wrapLocalRoute(getEmailHealthHandler));
+    app.post("/test/email", wrapLocalRoute(testEmailHandler));
 
     app.get("/getUsers", wrapLocalRoute(getUsersHandler));
     app.get("/getUserById", wrapLocalRoute(getUserByIdHandler));

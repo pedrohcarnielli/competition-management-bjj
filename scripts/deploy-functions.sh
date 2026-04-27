@@ -11,10 +11,7 @@ DEPLOY_TARGET=${1:-functions}
 
 # Valida o alvo de deploy
 if [ "$DEPLOY_TARGET" != "functions" ] && [ "$DEPLOY_TARGET" != "all" ] && \
-   [ "$DEPLOY_TARGET" != "user" ] && [ "$DEPLOY_TARGET" != "auth" ] && \
-   [ "$DEPLOY_TARGET" != "approval" ] && [ "$DEPLOY_TARGET" != "graduation" ] && \
-   [ "$DEPLOY_TARGET" != "role" ] && [ "$DEPLOY_TARGET" != "documentation" ] && \
-   [ "$DEPLOY_TARGET" != "email" ]; then
+  [ "$DEPLOY_TARGET" != "users" ] && [ "$DEPLOY_TARGET" != "api" ] && [ "$DEPLOY_TARGET" != "email" ]; then
   echo "❌ Alvo de deploy inválido: $DEPLOY_TARGET"
   echo ""
   echo "Opções válidas:"
@@ -23,13 +20,9 @@ if [ "$DEPLOY_TARGET" != "functions" ] && [ "$DEPLOY_TARGET" != "all" ] && \
   echo "  ./scripts/deploy-functions.sh all            # Deploy de functions, rules e indexes"
   echo ""
   echo "Deploy individual de functions:"
-  echo "  ./scripts/deploy-functions.sh user           # Deploy apenas user functions"
-  echo "  ./scripts/deploy-functions.sh auth           # Deploy apenas auth functions"
-  echo "  ./scripts/deploy-functions.sh approval       # Deploy apenas approval functions"
-  echo "  ./scripts/deploy-functions.sh graduation     # Deploy apenas graduation functions"
-  echo "  ./scripts/deploy-functions.sh role           # Deploy apenas role functions"
-  echo "  ./scripts/deploy-functions.sh documentation  # Deploy apenas documentation functions"
-  echo "  ./scripts/deploy-functions.sh email          # Deploy apenas email functions"
+  echo "  ./scripts/deploy-functions.sh users          # Deploy apenas da function users"
+  echo "  ./scripts/deploy-functions.sh api            # Alias para users (retrocompatibilidade)"
+  echo "  ./scripts/deploy-functions.sh email          # Deploy apenas da function dispatchEmail"
   exit 1
 fi
 
@@ -59,44 +52,21 @@ echo "🔨 Compilando TypeScript..."
 npm run build
 
 if [ "$DEPLOY_TARGET" = "functions" ]; then
-  echo "🚀 Fazendo deploy das functions..."
-  firebase deploy --only functions
+  echo "🚀 Fazendo deploy das duas functions (users e dispatchEmail)..."
+  firebase deploy --only functions:users,functions:dispatchEmail
   
 elif [ "$DEPLOY_TARGET" = "all" ]; then
   echo "🚀 Fazendo deploy completo (functions, firestore:rules, firestore:indexes)..."
   firebase deploy
 
 else
-  # Deploy individual de uma função específica
-  FUNCTION_NAME=""
-  
-  case "$DEPLOY_TARGET" in
-    user)
-      FUNCTION_NAME="user"
-      ;;
-    auth)
-      FUNCTION_NAME="auth"
-      ;;
-    approval)
-      FUNCTION_NAME="approval"
-      ;;
-    graduation)
-      FUNCTION_NAME="graduation"
-      ;;
-    role)
-      FUNCTION_NAME="role"
-      ;;
-    documentation)
-      FUNCTION_NAME="documentation"
-      ;;
-    email)
-      FUNCTION_NAME="email"
-      ;;
-  esac
-  
-  echo "🚀 Fazendo deploy das $DEPLOY_TARGET functions..."
-  # Deploy individual de funções específicas (substituir getUsers, login, etc. conforme necessário)
-  firebase deploy --only functions:getUsers,functions:getUserById,functions:getUserHistory,functions:createUserFunction,functions:updateUserFunction,functions:deleteUserFunction,functions:login,functions:getApprovalsFunction,functions:respondApprovalFunction,functions:getGraduations,functions:getRoles,functions:getUsersByRole,functions:healthEmail,functions:docs,functions:swaggerJson,functions:dispatchEmail
+  if [ "$DEPLOY_TARGET" = "users" ] || [ "$DEPLOY_TARGET" = "api" ]; then
+    echo "🚀 Fazendo deploy da function users..."
+    firebase deploy --only functions:users
+  else
+    echo "🚀 Fazendo deploy da function dispatchEmail..."
+    firebase deploy --only functions:dispatchEmail
+  fi
 fi
 
 echo ""

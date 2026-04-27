@@ -179,59 +179,17 @@ npm run build
 
 ### Cloud Functions
 
-Todas as Cloud Functions estão organizadas em módulos separados dentro de `src/cloud-functions/` para facilitar manutenção e deploy independente:
+O projeto possui **apenas 2 Cloud Functions**:
 
-```
-src/
-├── cloud-functions/
-│   ├── index.ts                    # Exporta todas as functions
-│   ├── user.functions.ts           # Funções de usuário
-│   ├── auth.functions.ts           # Funções de autenticação
-│   ├── approval.functions.ts       # Funções de aprovação
-│   ├── graduation.functions.ts     # Funções de graduação
-│   ├── role.functions.ts           # Funções de roles
-│   ├── documentation.functions.ts  # Funções de documentação
-│   └── email.functions.ts          # Funções de email
-├── handlers/                       # Lógica de request handlers
-├── services/                       # Serviços de negócio
-├── repositories/                   # Acesso a dados
-├── models/                         # Modelos TypeScript
-├── middleware/                     # Middlewares
-├── providers/                      # Provedores (Firebase, etc)
-└── utils/                          # Utilitários
-```
+1. `users`
+- Function HTTP única com o contexto completo da API
+- Reúne toda a gestão de usuário, autenticação, aprovações, graduações, roles e Swagger
+- Endpoints de documentação: `/docs` e `/swagger.json`
 
-### Categorias de Functions
-
-**User Functions** (`user.functions.ts`)
-- `getUsers` - listar usuários ativos
-- `getUserById` - buscar usuário por ID
-- `getUserHistory` - histórico de alterações do usuário
-- `createUserFunction` - criar novo usuário
-- `updateUserFunction` - atualizar usuário
-- `deleteUserFunction` - excluir usuário
-
-**Auth Functions** (`auth.functions.ts`)
-- `login` - autenticação de usuário
-
-**Approval Functions** (`approval.functions.ts`)
-- `getApprovalsFunction` - listar solicitações de aprovação
-- `respondApprovalFunction` - aprova/rejeita solicitação de responsável
-
-**Graduation Functions** (`graduation.functions.ts`)
-- `getGraduations` - listar graduações válidas por faixa etária
-
-**Role Functions** (`role.functions.ts`)
-- `getRoles` - listar roles/permissões disponíveis
-- `getUsersByRole` - listar usuários por role
-
-**Documentation Functions** (`documentation.functions.ts`)
-- `docs` - Swagger UI interativa
-- `swaggerJson` - OpenAPI JSON schema
-
-**Email Functions** (`email.functions.ts`)
-- `healthEmail` - health check do serviço de email
-- `dispatchEmail` - Firestore trigger que dispara emails da fila `mail`
+2. `dispatchEmail`
+- Function Firestore Trigger para monitoria e disparo efetivo de e-mail
+- Monitora a coleção definida em `MAIL_COLLECTION` (padrão `mail`)
+- Controla status `PENDING`, `PROCESSING`, `SENT`, `ERROR`
 
 ## Deploy
 
@@ -247,47 +205,34 @@ Este projeto inclui scripts shell para facilitar o deployment:
 
 #### 1. Deploy Firebase Functions e Firestore
 
-Faz deploy de Cloud Functions, regras e indexes do Firestore. Suporta deploy total ou de funções específicas.
+Faz deploy de Cloud Functions, regras e indexes do Firestore.
 
 ```bash
-# Deploy apenas das functions (padrão)
+# Deploy das duas functions (users + dispatchEmail)
 ./scripts/deploy-functions.sh
 
-# Deploy apenas das functions (explícito)
+# Deploy das duas functions (explícito)
 ./scripts/deploy-functions.sh functions
+
+# Deploy apenas da API (function users)
+./scripts/deploy-functions.sh users
+
+# Alias legado para users
+./scripts/deploy-functions.sh api
+
+# Deploy apenas do disparo de e-mail
+./scripts/deploy-functions.sh email
 
 # Deploy completo: functions + firestore rules + indexes
 ./scripts/deploy-functions.sh all
 ```
 
-**Deploy individual de funções:**
-
-```bash
-./scripts/deploy-functions.sh user           # getUsers, getUserById, getUserHistory, create, update, delete
-./scripts/deploy-functions.sh auth           # login
-./scripts/deploy-functions.sh approval       # getApprovalsFunction, respondApprovalFunction
-./scripts/deploy-functions.sh graduation     # getGraduations
-./scripts/deploy-functions.sh role           # getRoles, getUsersByRole
-./scripts/deploy-functions.sh documentation  # docs, swaggerJson
-./scripts/deploy-functions.sh email          # healthEmail, dispatchEmail
-```
-
 **Opções disponíveis:**
-- sem parâmetro ou `functions` - Deploy apenas das Cloud Functions
+- sem parâmetro ou `functions` - Deploy de `users` + `dispatchEmail`
+- `users` - Deploy apenas da function `users`
+- `api` - Alias para `users` (retrocompatibilidade)
+- `email` - Deploy apenas da function `dispatchEmail`
 - `all` - Deploy completo (functions, Firestore rules e indexes)
-- `user|auth|approval|graduation|role|documentation|email` - Deploy individual de grupo de funções
-
-**Estrutura de arquivos:**
-
-As Cloud Functions estão organizadas em `src/cloud-functions/`:
-- `user.functions.ts` - Funções de usuário (CRUD)
-- `auth.functions.ts` - Funções de autenticação
-- `approval.functions.ts` - Funções de aprovação de responsáveis
-- `graduation.functions.ts` - Funções de graduação por faixa etária
-- `role.functions.ts` - Funções de roles/permissões
-- `documentation.functions.ts` - Funções de documentação (Swagger)
-- `email.functions.ts` - Funções de envio de email e health check
-- `index.ts` - Exporta todas as functions
 
 **O que faz:**
 - Valida instalação do Firebase CLI
@@ -295,9 +240,10 @@ As Cloud Functions estão organizadas em `src/cloud-functions/`:
 - Instala dependências (`npm install`)
 - Compila TypeScript (`npm run build`)
 - Deploy conforme opção selecionada:
-  - `functions`: executa `firebase deploy --only functions`
+  - `functions`: executa `firebase deploy --only functions:users,functions:dispatchEmail`
+  - `users` (ou `api`): executa `firebase deploy --only functions:users`
+  - `email`: executa `firebase deploy --only functions:dispatchEmail`
   - `all`: executa `firebase deploy` (tudo)
-  - Grupo específico: executa `firebase deploy --only functions:<list>`
 
 **Pré-requisitos:**
 - Firebase CLI instalado: `npm install -g firebase-tools`
